@@ -1,6 +1,5 @@
 const WeatherAPI = window.WeatherAPI
 
-// dashboard page functionality
 class Dashboard {
   constructor() {
     this.currentCity = { name: "London", lat: 51.5074, lon: -0.1278 }
@@ -25,21 +24,38 @@ class Dashboard {
     if (weatherData) {
       this.updateWeatherDisplay(weatherData)
     }
+    const forecastData = await WeatherAPI.getForecast(this.currentCity.lat, this.currentCity.lon)
+    if (forecastData && forecastData.list) {
+      this.updateHourlyForecast(forecastData.list)
+    }
+  }
+
+  updateHourlyForecast(forecastList) {
+    const hourlyForecast = document.getElementById("hourly-forecast")
+    if (!hourlyForecast) return
+    const hours = forecastList.slice(0, 6)
+    hourlyForecast.innerHTML = hours.map(item => {
+      const date = new Date(item.dt * 1000)
+      const hour = date.getHours().toString().padStart(2, "0") + ":00"
+      const icon = WeatherAPI.getWeatherIcon(item.weather[0].icon)
+      return `
+        <div class="hour-item">
+          <div class="time">${hour}</div>
+          <img src="${icon}" class="icon" alt="${item.weather[0].description}">
+          <div class="temp">${Math.round(item.main.temp)}°C</div>
+        </div>
+      `
+    }).join("")
   }
 
   updateWeatherDisplay(data) {
-    // Updating main weather info
     document.querySelector(".weather-info h2").textContent = data.name
     document.querySelector(".temperature").textContent = `${Math.round(data.main.temp)}°C`
     document.querySelector(".weather-description").textContent = data.weather[0].description
-
-    // Updating weather icon
     const weatherIcon = document.querySelector(".weather-icon i")
     if (weatherIcon) {
       weatherIcon.className = this.getWeatherIconClass(data.weather[0].icon)
     }
-
-    // Updating weather details
     const details = document.querySelectorAll(".weather-detail span")
     if (details.length >= 4) {
       details[0].textContent = `${data.main.humidity}%`
@@ -47,6 +63,30 @@ class Dashboard {
       details[2].textContent = `${data.main.pressure} hPa`
       details[3].textContent = `${data.visibility / 1000} km`
     }
+    this.updateHighlights(data)
+  }
+
+  updateHighlights(data) {
+    const highlightsGrid = document.getElementById("highlights-grid")
+    if (!highlightsGrid) return
+    highlightsGrid.innerHTML = `
+      <div class="highlight-item">
+        <label>UV Index</label>
+        <div class="value">${data.uvi !== undefined ? data.uvi : "--"}</div>
+      </div>
+      <div class="highlight-item">
+        <label>Visibility</label>
+        <div class="value">${data.visibility ? (data.visibility / 1000).toFixed(1) : "--"} km</div>
+      </div>
+      <div class="highlight-item">
+        <label>Sunrise</label>
+        <div class="value">${data.sys && data.sys.sunrise ? new Date(data.sys.sunrise * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "--"}</div>
+      </div>
+      <div class="highlight-item">
+        <label>Sunset</label>
+        <div class="value">${data.sys && data.sys.sunset ? new Date(data.sys.sunset * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "--"}</div>
+      </div>
+    `
   }
 
   getWeatherIconClass(iconCode) {
@@ -76,13 +116,11 @@ class Dashboard {
   async loadCityCards() {
     const cityCardsContainer = document.querySelector(".city-cards")
     if (!cityCardsContainer) return
-
     const DEFAULT_CITIES = [
       { name: "New York", coords: [40.7128, -74.006] },
       { name: "Tokyo", coords: [35.6895, 139.6917] },
       { name: "Sydney", coords: [-33.8688, 151.2093] },
     ]
-
     for (const city of DEFAULT_CITIES) {
       const weatherData = await WeatherAPI.getCurrentWeather(city.coords[0], city.coords[1])
       if (weatherData) {
@@ -96,7 +134,6 @@ class Dashboard {
     if (cityCard) {
       const tempElement = cityCard.querySelector(".temp")
       const conditionElement = cityCard.querySelector(".condition")
-
       if (tempElement) tempElement.textContent = `${Math.round(weatherData.main.temp)}°C`
       if (conditionElement) conditionElement.textContent = weatherData.weather[0].main
     }
@@ -110,4 +147,4 @@ class Dashboard {
 
 window.dashboard = new Dashboard()
 
-document.addEventListener("DOMContentLoaded", () => {})
+document.addEventListener("DOMContentLoaded", () => { })

@@ -185,3 +185,25 @@ class Forecast {
 }
 
 window.forecast = new Forecast()
+
+document.addEventListener("DOMContentLoaded", () => {
+  window.forecast.initForecastChart()
+
+  const searchInput = document.getElementById("search-input")
+  if (searchInput) {
+    searchInput.addEventListener("keypress", async (e) => {
+      if (e.key === "Enter") {
+        const cityName = searchInput.value.trim()
+        if (cityName) {
+          const cityDataArr = await WeatherAPI.searchCity(cityName)
+          const cityData = Array.isArray(cityDataArr) && cityDataArr.length > 0 ? cityDataArr[0] : null
+          if (cityData) {
+            window.forecast.updateCity(cityData.lat, cityData.lon)
+          } else {
+            alert("City not found. Please try a different search term.")
+          }
+        }
+      }
+    })
+  }
+})

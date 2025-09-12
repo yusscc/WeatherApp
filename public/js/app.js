@@ -62,7 +62,7 @@ class WeatherApp {
         break
       case "locations":
         if (locations) {
-          locations.initMap()
+          locations.init()
         }
         break
       case "forecast":
@@ -91,22 +91,17 @@ class WeatherApp {
   }
 
   async searchCity(cityName) {
-    const cityData = await WeatherAPI.searchCity(cityName)
+    const cityDataArr = await WeatherAPI.searchCity(cityName)
+    const cityData = Array.isArray(cityDataArr) && cityDataArr.length > 0 ? cityDataArr[0] : null
 
     if (cityData) {
-      // Updating dashboard with searched city
       if (dashboard) {
         dashboard.updateCity(cityData.name, cityData.lat, cityData.lon)
       }
-
-      // Updating forecast if on forecast page
       if (this.currentPage === "forecast" && forecast) {
         forecast.updateCity(cityData.lat, cityData.lon)
       }
-
-      // navigatinh to dashboard to show results
       this.showPage("dashboard")
-
       console.log(`Weather loaded for ${cityData.name}`)
     } else {
       alert("City not found. Please try a different search term.")
