@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - WeatherDash</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/public/css/dashboard.css">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-cloud-sun"></i>
+            <h1>WeatherDash</h1>
+        </div>
+        
+        <ul class="nav-links">
+            <li><a href="dashboard.html" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+            <li><a href="locations.html"><i class="fas fa-map-marker-alt"></i> <span>Locations</span></a></li>
+            <li><a href="forecast.html"><i class="fas fa-chart-line"></i> <span>Forecast</span></a></li>
+            <li><a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+            <li><a href="about.html"><i class="fas fa-info-circle"></i> <span>About</span></a></li>
+        </ul>
+    </aside>
+
+    <div class="main-content">
+        <header>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search city..." id="search-input">
+            </div>
+            
+            <div class="header-right">
+                <div class="header-actions">
+                    <button id="theme-toggle"><i class="fas fa-moon"></i></button>
+                </div>
+            </div>
+        </header>
+        
+        <div class="dashboard">
+            <div class="dashboard-header">
+                <h1 id="dashboard-title">Dashboard: London</h1>
+                <p>Updated: <span id="current-date">27 November at 11:00</span></p>
+            </div>
+            
+            <div class="weather-cards">
+                <div class="card current-weather" id="current-weather-card">
+                    <div class="weather-info">
+                        <h2 id="current-location">London, UK</h2>
+                        <div class="temperature" id="current-temp">14°C</div>
+                        <p id="current-description">Feels like: 13°C • Cloudy</p>
+                        
+                        <div class="weather-details">
+                            <div class="detail">
+                                <label>Humidity</label>
+                                <span id="current-humidity">78%</span>
+                            </div>
+                            <div class="detail">
+                                <label>Wind</label>
+                                <span id="current-wind">12 km/h</span>
+                            </div>
+                            <div class="detail">
+                                <label>Pressure</label>
+                                <span id="current-pressure">1012 hPa</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="weather-icon">
+                        <i class="fas fa-cloud" id="current-icon"></i>
+                    </div>
+                </div>
+                
+                <div class="card forecast-card">
+                    <h3>Hourly Forecast</h3>
+                    <div class="hourly-forecast" id="hourly-forecast">
+                    </div>
+                </div>
+                
+                <div class="card highlights-card">
+                    <h3>Today's Highlights</h3>
+                    <div class="highlights-grid" id="highlights-grid">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/config.js"></script>
+    <script type="module" src="js/weather.js"></script>
+    <script type="module" src="js/cities.js"></script>
+    <script type="module" src="js/dashboard.js"></script>
+    <script type="module" src="js/settings.js"></script>
+</body>
+</html>

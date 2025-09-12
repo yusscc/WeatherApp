@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Locations - WeatherDash</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+    <link rel="stylesheet" href="/public/css/locations.css">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-cloud-sun"></i>
+            <h1>WeatherDash</h1>
+        </div>
+        
+        <ul class="nav-links">
+            <li><a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+            <li><a href="locations.html" class="active"><i class="fas fa-map-marker-alt"></i> <span>Locations</span></a></li>
+            <li><a href="forecast.html"><i class="fas fa-chart-line"></i> <span>Forecast</span></a></li>
+            <li><a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+            <li><a href="about.html"><i class="fas fa-info-circle"></i> <span>About</span></a></li>
+        </ul>
+    </aside>
+    <div class="main-content">
+        <header>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search any city worldwide..." id="search-input">
+                <div class="search-suggestions" id="search-suggestions"></div>
+            </div>
+            
+            <div class="header-right">
+                <div class="header-actions">
+                    <button id="theme-toggle"><i class="fas fa-moon"></i></button>
+                </div>
+            </div>
+        </header>
+        <div class="page-content">
+            <div class="dashboard-header">
+                <h1>Global Weather Globe</h1>
+                <p>Explore weather information for cities around the world on an interactive 3D globe</p>
+            </div>
+            
+            <div class="globe-container">
+                <div class="globe-controls">
+                    <button id="reset-view">Reset View</button>
+                    <button id="toggle-rotation">Pause Rotation</button>
+                </div>
+                <div id="globe"></div>
+            </div>
+            
+            <h2>Weather Information</h2>
+            <div class="cities-grid" id="cities-grid">
+                <div class="loading">Loading weather data...</div>
+            </div>
+        </div>
+    </div>
+    <script src="js/config.js"></script>
+    <script src="js/weather.js"></script>
+    <script src="js/cities.js"></script>
+    <script src="js/locations.js"></script>
+    <script src="js/settings.js"></script>
+</body>
+</html>

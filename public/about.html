@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - WeatherDash</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/public/css/about.css">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-cloud-sun"></i>
+            <h1>WeatherDash</h1>
+        </div>
+        
+        <ul class="nav-links">
+            <li><a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+            <li><a href="locations.html"><i class="fas fa-map-marker-alt"></i> <span>Locations</span></a></li>
+            <li><a href="forecast.html"><i class="fas fa-chart-line"></i> <span>Forecast</span></a></li>
+            <li><a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+            <li><a href="about.html" class="active"><i class="fas fa-info-circle"></i> <span>About</span></a></li>
+        </ul>
+    </aside>
+
+    <div class="main-content">
+        <header>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search city..." id="search-input">
+            </div>
+            
+            <div class="header-right">
+                <div class="header-actions">
+                    <button id="theme-toggle"><i class="fas fa-moon"></i></button>
+                </div>
+            </div>
+        </header>
+        
+        <div class="page-content">
+            <div class="dashboard-header">
+                <h1>About WeatherDash</h1>
+                <p>Learn more about our weather dashboard application</p>
+            </div>
+            
+            <div class="about-content">
+                <h2>Our Mission</h2>
+                <p>WeatherDash is designed to provide accurate, up-to-date weather information in a clean, intuitive interface. Our goal is to help you plan your day, week, or even your travel with reliable weather forecasts from around the world.</p>
+                
+                <h2>Features</h2>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <h3>Global Coverage</h3>
+                        <p>Access weather data for cities worldwide with our interactive map.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-sliders-h"></i>
+                        <h3>Customization</h3>
+                        <p>Personalize your dashboard with themes and display preferences.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Detailed Forecasts</h3>
+                        <p>View hourly and 7-day forecasts with comprehensive weather data.</p>
+                    </div>
+                </div>
+                <h2>Technology</h2>
+                <p>WeatherDash uses reliable weather data from trusted meteorological sources. This application is built with modern web technologies including HTML5, CSS3, JavaScript, and Leaflet.js for interactive maps.</p>
+                <h2>Team</h2>
+                <p>The team has 3 members: Me, Myself and I 🥲</p>
+                <h2>Contact Us</h2>
+                <p>I hope you don't have any questions have a great day :)</p>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="js/config.js"></script>
+    <script type="module" src="js/settings.js"></script>
+</body>
+</html>

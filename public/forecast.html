@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forecast - WeatherDash</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/public/css/forecast.css">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-cloud-sun"></i>
+            <h1>WeatherDash</h1>
+        </div>
+        
+        <ul class="nav-links">
+            <li><a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+            <li><a href="locations.html"><i class="fas fa-map-marker-alt"></i> <span>Locations</span></a></li>
+            <li><a href="forecast.html" class="active"><i class="fas fa-chart-line"></i> <span>Forecast</span></a></li>
+            <li><a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+            <li><a href="about.html"><i class="fas fa-info-circle"></i> <span>About</span></a></li>
+        </ul>
+    </aside>
+
+    <div class="main-content">
+        <header>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search city..." id="search-input">
+            </div>
+            
+            <div class="header-right">
+                <div class="header-actions">
+                    <button id="theme-toggle"><i class="fas fa-moon"></i></button>
+                </div>
+            </div>
+        </header>
+        
+        <div class="page-content">
+            <div class="dashboard-header">
+                <h1 id="forecast-title">7-Day Forecast: London</h1>
+                <p>Detailed weather forecast for the upcoming week</p>
+            </div>
+            
+            <div class="forecast-chart">
+                <h3>Temperature Forecast</h3>
+                <div class="chart-container">
+                    <canvas id="temperatureChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="weather-cards" id="forecast-cards">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="js/config.js"></script>
+    <script type="module" src="js/weather.js"></script>
+    <script type="module" src="js/cities.js"></script>
+    <script type="module" src="js/forecast.js"></script>
+    <script type="module" src="js/settings.js"></script>
+</body>
+</html>
