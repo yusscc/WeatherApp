@@ -2,14 +2,14 @@ const WeatherAPI = window.WeatherAPI
 
 class Dashboard {
   constructor() {
-    this.currentCity = { name: "London", lat: 51.5074, lon: -0.1278 }
+    this.currentCity = { name: "London", lat: 51.5074, lon: -0.1278, country: "GB" }
     this.init()
   }
 
   init() {
     this.updateCurrentDate()
     this.loadCurrentWeather()
-    this.loadCityCards()
+    this.setupSearch()
   }
 
   updateCurrentDate() {
@@ -30,39 +30,16 @@ class Dashboard {
     }
   }
 
-  updateHourlyForecast(forecastList) {
-    const hourlyForecast = document.getElementById("hourly-forecast")
-    if (!hourlyForecast) return
-    const hours = forecastList.slice(0, 6)
-    hourlyForecast.innerHTML = hours.map(item => {
-      const date = new Date(item.dt * 1000)
-      const hour = date.getHours().toString().padStart(2, "0") + ":00"
-      const icon = WeatherAPI.getWeatherIcon(item.weather[0].icon)
-      return `
-        <div class="hour-item">
-          <div class="time">${hour}</div>
-          <img src="${icon}" class="icon" alt="${item.weather[0].description}">
-          <div class="temp">${Math.round(item.main.temp)}°C</div>
-        </div>
-      `
-    }).join("")
-  }
-
   updateWeatherDisplay(data) {
-    document.querySelector(".weather-info h2").textContent = data.name
-    document.querySelector(".temperature").textContent = `${Math.round(data.main.temp)}°C`
-    document.querySelector(".weather-description").textContent = data.weather[0].description
-    const weatherIcon = document.querySelector(".weather-icon i")
-    if (weatherIcon) {
-      weatherIcon.className = this.getWeatherIconClass(data.weather[0].icon)
-    }
-    const details = document.querySelectorAll(".weather-detail span")
-    if (details.length >= 4) {
-      details[0].textContent = `${data.main.humidity}%`
-      details[1].textContent = `${data.wind.speed} m/s`
-      details[2].textContent = `${data.main.pressure} hPa`
-      details[3].textContent = `${data.visibility / 1000} km`
-    }
+    document.getElementById("dashboard-title").textContent = `Dashboard: ${data.name}`
+    document.getElementById("current-location").textContent = `${data.name}, ${data.sys.country}`
+    document.getElementById("current-temp").textContent = `${Math.round(data.main.temp)}°C`
+    document.getElementById("current-description").textContent = `Feels like: ${Math.round(data.main.feels_like)}°C • ${data.weather[0].description.charAt(0).toUpperCase() + data.weather[0].description.slice(1)}`
+    document.getElementById("current-humidity").textContent = `${data.main.humidity}%`
+    document.getElementById("current-wind").textContent = `${data.wind.speed} m/s`
+    document.getElementById("current-pressure").textContent = `${data.main.pressure} hPa`
+    const iconClass = this.getWeatherIconClass(data.weather[0].icon)
+    document.getElementById("current-icon").className = iconClass
     this.updateHighlights(data)
   }
 
@@ -89,6 +66,24 @@ class Dashboard {
     `
   }
 
+  updateHourlyForecast(forecastList) {
+    const hourlyForecast = document.getElementById("hourly-forecast")
+    if (!hourlyForecast) return
+    const hours = forecastList.slice(0, 6)
+    hourlyForecast.innerHTML = hours.map(item => {
+      const date = new Date(item.dt * 1000)
+      const hour = date.getHours().toString().padStart(2, "0") + ":00"
+      const icon = WeatherAPI.getWeatherIcon(item.weather[0].icon)
+      return `
+        <div class="hour-item">
+          <div class="time">${hour}</div>
+          <img src="${icon}" class="icon" alt="${item.weather[0].description}">
+          <div class="temp">${Math.round(item.main.temp)}°C</div>
+        </div>
+      `
+    }).join("")
+  }
+
   getWeatherIconClass(iconCode) {
     const iconMap = {
       "01d": "fas fa-sun",
@@ -113,38 +108,30 @@ class Dashboard {
     return iconMap[iconCode] || "fas fa-cloud"
   }
 
-  async loadCityCards() {
-    const cityCardsContainer = document.querySelector(".city-cards")
-    if (!cityCardsContainer) return
-    const DEFAULT_CITIES = [
-      { name: "New York", coords: [40.7128, -74.006] },
-      { name: "Tokyo", coords: [35.6895, 139.6917] },
-      { name: "Sydney", coords: [-33.8688, 151.2093] },
-    ]
-    for (const city of DEFAULT_CITIES) {
-      const weatherData = await WeatherAPI.getCurrentWeather(city.coords[0], city.coords[1])
-      if (weatherData) {
-        this.updateCityCard(city.name, weatherData)
+  setupSearch() {
+    const searchInput = document.getElementById("search-input")
+    if (!searchInput) return
+    searchInput.addEventListener("keypress", async (e) => {
+      if (e.key === "Enter") {
+        const cityName = searchInput.value.trim()
+        if (cityName) {
+          const cityDataArr = await WeatherAPI.searchCity(cityName)
+          const cityData = Array.isArray(cityDataArr) && cityDataArr.length > 0 ? cityDataArr[0] : null
+          if (cityData) {
+            this.currentCity = {
+              name: cityData.name,
+              lat: cityData.lat,
+              lon: cityData.lon,
+              country: cityData.country || ""
+            }
+            this.loadCurrentWeather()
+          } else {
+            alert("City not found. Please try a different search term.")
+          }
+        }
       }
-    }
-  }
-
-  updateCityCard(cityName, weatherData) {
-    const cityCard = document.querySelector(`[data-city="${cityName}"]`)
-    if (cityCard) {
-      const tempElement = cityCard.querySelector(".temp")
-      const conditionElement = cityCard.querySelector(".condition")
-      if (tempElement) tempElement.textContent = `${Math.round(weatherData.main.temp)}°C`
-      if (conditionElement) conditionElement.textContent = weatherData.weather[0].main
-    }
-  }
-
-  async updateCity(cityName, lat, lon) {
-    this.currentCity = { name: cityName, lat, lon }
-    await this.loadCurrentWeather()
+    })
   }
 }
 
 window.dashboard = new Dashboard()
-
-document.addEventListener("DOMContentLoaded", () => { })

@@ -3,7 +3,7 @@ const WeatherAPI = window.WeatherAPI
 class Forecast {
   constructor() {
     this.chart = null
-    this.currentCity = { lat: 51.5074, lon: -0.1278 }
+    this.currentCity = { lat: 51.5074, lon: -0.1278, name: "London", country: "GB" }
   }
 
   async initForecastChart() {
@@ -14,39 +14,68 @@ class Forecast {
       return
     }
 
+    let cityName = this.currentCity.name
+    let country = this.currentCity.country
+    if (forecastData.city) {
+      cityName = forecastData.city.name || cityName
+      country = forecastData.city.country || country
+    }
+
+    this.updateCityInfoBar({
+      name: cityName,
+      country: country,
+      lat: this.currentCity.lat,
+      lon: this.currentCity.lon,
+    }, forecastData)
+
     this.updateForecastCards(forecastData)
     this.createTemperatureChart(forecastData)
   }
 
+  updateCityInfoBar(cityData, forecastData) {
+    document.getElementById("forecast-city-name").textContent = cityData.name || "Unknown"
+    document.getElementById("forecast-country").textContent = cityData.country || ""
+    document.getElementById("forecast-coords").innerHTML =
+      `<i class="fas fa-map-marker-alt"></i> ${Number(cityData.lat).toFixed(2)}, ${Number(cityData.lon).toFixed(2)}`
+    if (forecastData && forecastData.list && forecastData.list.length > 0) {
+      const date = new Date(forecastData.list[0].dt * 1000)
+      document.getElementById("forecast-date").textContent =
+        date.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
+    } else {
+      document.getElementById("forecast-date").textContent = ""
+    }
+  }
+
   updateForecastCards(forecastData) {
-    const forecastCards = document.querySelectorAll(".forecast-card")
+    const cardsContainer = document.getElementById("forecast-cards")
+    if (!cardsContainer) return
+    cardsContainer.innerHTML = ""
+
     const dailyForecasts = this.processDailyForecast(forecastData.list)
 
-    forecastCards.forEach((card, index) => {
-      if (dailyForecasts[index]) {
-        const forecast = dailyForecasts[index]
-        const dayElement = card.querySelector(".forecast-day")
-        const iconElement = card.querySelector(".forecast-icon i")
-        const tempElement = card.querySelector(".forecast-temp")
-        const conditionElement = card.querySelector(".forecast-condition")
+    dailyForecasts.forEach((forecast) => {
+      const date = new Date(forecast.dt * 1000)
+      const day = date.toLocaleDateString("en-GB", { weekday: "short" })
+      const iconClass = this.getWeatherIconClass(forecast.weather[0].icon)
+      const tempMax = Math.round(forecast.main.temp_max)
+      const tempMin = Math.round(forecast.main.temp_min)
+      const condition = forecast.weather[0].main
+      const humidity = forecast.main.humidity
+      const wind = forecast.wind.speed
 
-        if (dayElement) {
-          const date = new Date(forecast.dt * 1000)
-          dayElement.textContent = date.toLocaleDateString("en-GB", { weekday: "short" })
-        }
-
-        if (iconElement) {
-          iconElement.className = this.getWeatherIconClass(forecast.weather[0].icon)
-        }
-
-        if (tempElement) {
-          tempElement.textContent = `${Math.round(forecast.main.temp_max)}°/${Math.round(forecast.main.temp_min)}°`
-        }
-
-        if (conditionElement) {
-          conditionElement.textContent = forecast.weather[0].main
-        }
-      }
+      const card = document.createElement("div")
+      card.className = "card forecast-card"
+      card.innerHTML = `
+        <div class="forecast-day">${day}</div>
+        <div class="forecast-icon"><i class="${iconClass}"></i></div>
+        <div class="forecast-temp">${tempMax}°/${tempMin}°</div>
+        <div class="forecast-condition">${condition}</div>
+        <div class="forecast-details">
+          <span><i class="fas fa-tint"></i> ${humidity}%</span>
+          <span><i class="fas fa-wind"></i> ${wind} m/s</span>
+        </div>
+      `
+      cardsContainer.appendChild(card)
     })
   }
 
@@ -178,8 +207,8 @@ class Forecast {
     return iconMap[iconCode] || "fas fa-cloud"
   }
 
-  updateCity(lat, lon) {
-    this.currentCity = { lat, lon }
+  updateCity(lat, lon, name = "Unknown", country = "") {
+    this.currentCity = { lat, lon, name, country }
     this.initForecastChart()
   }
 }
@@ -198,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const cityDataArr = await WeatherAPI.searchCity(cityName)
           const cityData = Array.isArray(cityDataArr) && cityDataArr.length > 0 ? cityDataArr[0] : null
           if (cityData) {
-            window.forecast.updateCity(cityData.lat, cityData.lon)
+            window.forecast.updateCity(cityData.lat, cityData.lon, cityData.name, cityData.country)
           } else {
             alert("City not found. Please try a different search term.")
           }

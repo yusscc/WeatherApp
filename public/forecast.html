@@ -14,7 +14,6 @@
             <i class="fas fa-cloud-sun"></i>
             <h1>WeatherDash</h1>
         </div>
-        
         <ul class="nav-links">
             <li><a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
             <li><a href="locations.html"><i class="fas fa-map-marker-alt"></i> <span>Locations</span></a></li>
@@ -30,32 +29,37 @@
                 <i class="fas fa-search"></i>
                 <input type="text" placeholder="Search city..." id="search-input">
             </div>
-            
             <div class="header-right">
                 <div class="header-actions">
                     <button id="theme-toggle"><i class="fas fa-moon"></i></button>
                 </div>
             </div>
         </header>
-        
         <div class="page-content">
+            <div class="city-info-bar">
+                <div class="city-main">
+                    <h1 id="forecast-city-name">London</h1>
+                    <span id="forecast-country" class="country-label">GB</span>
+                </div>
+                <div class="city-meta">
+                    <span id="forecast-coords"><i class="fas fa-map-marker-alt"></i> 51.51, -0.13</span>
+                    <span id="forecast-date"></span>
+                </div>
+            </div>
             <div class="dashboard-header">
-                <h1 id="forecast-title">7-Day Forecast: London</h1>
+                <h2 id="forecast-title">7-Day Forecast</h2>
                 <p>Detailed weather forecast for the upcoming week</p>
             </div>
-            
             <div class="forecast-chart">
                 <h3>Temperature Forecast</h3>
                 <div class="chart-container">
                     <canvas id="temperatureChart"></canvas>
                 </div>
             </div>
-            
             <div class="weather-cards" id="forecast-cards">
             </div>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="/public/js/config.js"></script>
     <script type="module" src="/public/js/weather.js"></script>
