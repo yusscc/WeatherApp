@@ -1,4 +1,3 @@
-const WEATHER_CONFIG = window.WEATHER_CONFIG
 
 class WeatherAPI {
   static async getCurrentWeather(lat, lon) {

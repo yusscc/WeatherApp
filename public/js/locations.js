@@ -1,6 +1,8 @@
 const THREE = window.THREE
-const WeatherAPI = window.WeatherAPI
-const DEFAULT_CITIES = window.DEFAULT_CITIES
+
+if (window.THREE && window.OrbitControls && !window.THREE.OrbitControls) {
+    window.THREE.OrbitControls = window.OrbitControls;
+}
 
 class Locations {
   constructor() {
@@ -14,6 +16,7 @@ class Locations {
     this.isRotating = true
     this.animationId = null
     this._markerAnimationId = null
+    this.selectedCity = null
   }
 
   init() {
@@ -29,25 +32,16 @@ class Locations {
 
   initGlobe() {
     const container = document.getElementById("globe")
-    if (!container) {
-      console.error("Globe container (#globe) not found in DOM.")
-      return
-    }
-    if (!THREE) {
-      console.error("Three.js is not loaded. Make sure <script src='three.min.js'> is included before locations.js")
-      return
-    }
-    const cw = container.clientWidth || container.offsetWidth || 400
-    const ch = container.clientHeight || container.offsetHeight || 300
-    if (cw === 0 || ch === 0) {
-      container.style.minHeight = "300px"
-    }
+    if (!container) return
+    const cw = container.clientWidth || 400
+    const ch = container.clientHeight || 400
     this.scene = new THREE.Scene()
-    this.camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight || (cw / ch), 0.1, 1000)
+    this.camera = new THREE.PerspectiveCamera(75, cw / ch, 0.1, 1000)
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
     this.renderer.setPixelRatio(window.devicePixelRatio || 1)
-    this.renderer.setSize(container.clientWidth || cw, container.clientHeight || ch)
+    this.renderer.setSize(cw, ch)
     this.renderer.setClearColor(0x000000, 0)
+    container.innerHTML = ""
     container.appendChild(this.renderer.domElement)
     const geometry = new THREE.SphereGeometry(5, 64, 64)
     const canvas = document.createElement("canvas")
@@ -95,12 +89,8 @@ class Locations {
           this.controls.minDistance = 8
           this.controls.maxDistance = 25
         }
-      } else {
-        console.warn("OrbitControls not found. Manual camera control will be disabled.")
       }
-    } catch (err) {
-      console.warn("Error creating OrbitControls:", err)
-    }
+    } catch (err) {}
     this.animate()
     this._startMarkerAnimation()
     window.addEventListener("resize", () => this.handleResize())
@@ -119,7 +109,6 @@ class Locations {
         this.renderer.render(this.scene, this.camera)
       }
     } catch (err) {
-      console.error("Error in animate loop:", err)
       if (this.animationId) {
         cancelAnimationFrame(this.animationId)
         this.animationId = null
@@ -131,7 +120,7 @@ class Locations {
     const container = document.getElementById("globe")
     if (!container || !this.camera || !this.renderer) return
     const w = container.clientWidth || 400
-    const h = container.clientHeight || 300
+    const h = container.clientHeight || 400
     this.camera.aspect = w / h
     this.camera.updateProjectionMatrix()
     this.renderer.setSize(w, h)
@@ -163,6 +152,11 @@ class Locations {
       originalScale: 1,
       pulseSpeed: Math.random() * 0.02 + 0.01,
     }
+    marker.cursor = "pointer"
+    marker.onClick = () => {
+      this.showWeatherPanel(city, weather)
+      this.focusOnCity(city.lat, city.lon)
+    }
     this.scene.add(marker)
     this.markers.push(marker)
     this.addCityToGrid(city, weather)
@@ -185,7 +179,6 @@ class Locations {
           const cities = await WeatherAPI.searchCity(query)
           this.showSearchSuggestions(Array.isArray(cities) ? cities : [], searchSuggestions)
         } catch (err) {
-          console.error("Search city error:", err)
           this.showSearchSuggestions([], searchSuggestions)
         }
       }, 300)
@@ -234,9 +227,8 @@ class Locations {
         this.addCityMarker(city, weatherData)
       }
       this.focusOnCity(city.lat, city.lon)
-    } catch (error) {
-      console.error("Error selecting city:", error)
-    }
+      this.showWeatherPanel(city, weatherData)
+    } catch (error) {}
   }
 
   focusOnCity(lat, lon) {
@@ -259,7 +251,7 @@ class Locations {
     animateCamera()
   }
 
-  async loadDefaultCities() {
+async loadDefaultCities() {
     const citiesGrid = document.getElementById("cities-grid")
     if (citiesGrid) citiesGrid.innerHTML = '<div class="loading">Loading weather data...</div>'
     try {
@@ -274,6 +266,7 @@ class Locations {
         }
       })
       const citiesWithWeather = await Promise.all(weatherPromises)
+      citiesGrid.innerHTML = ""
       citiesWithWeather.forEach((city) => {
         if (city && city.weather) {
           this.addCityMarker(city, city.weather)
@@ -281,12 +274,10 @@ class Locations {
           this.addCityMarker(city, null)
         }
       })
-      if (citiesGrid) citiesGrid.innerHTML = ""
     } catch (error) {
-      console.error("Error loading cities:", error)
       if (citiesGrid) citiesGrid.innerHTML = '<div class="error">Error loading weather data</div>'
     }
-  }
+}
 
   addCityToGrid(city, weather) {
     const citiesGrid = document.getElementById("cities-grid")
@@ -316,27 +307,37 @@ class Locations {
     `
     cityCard.addEventListener("click", () => {
       this.focusOnCity(city.lat, city.lon)
+      this.showWeatherPanel(city, weather)
     })
     citiesGrid.appendChild(cityCard)
   }
 
+  showWeatherPanel(city, weather) {
+    const panel = document.getElementById("weather-3d-panel")
+    if (!panel) return
+    if (!weather || !weather.main) {
+      panel.innerHTML = `<div class="panel-inner">No weather data available.</div>`
+      return
+    }
+    panel.innerHTML = `
+      <div class="panel-inner">
+        <h2>${city.name}, ${city.country || ""}</h2>
+        <div class="panel-row">
+          <img src="${WeatherAPI.getWeatherIcon(weather.weather[0].icon)}" alt="${weather.weather[0].description}" style="width:48px;height:48px;">
+          <span class="panel-temp">${Math.round(weather.main.temp)}°C</span>
+        </div>
+        <div class="panel-desc">${weather.weather[0].description}</div>
+        <div class="panel-details">
+          <span>Humidity: ${weather.main.humidity}%</span>
+          <span>Wind: ${weather.wind.speed} m/s</span>
+          <span>Pressure: ${weather.main.pressure} hPa</span>
+        </div>
+      </div>
+    `
+    panel.style.display = "block"
+  }
+
   setupEventListeners() {
-    const resetBtn = document.getElementById("reset-view")
-    if (resetBtn) {
-      resetBtn.addEventListener("click", () => {
-        if (this.camera) {
-          this.camera.position.set(0, 0, 15)
-          this.camera.lookAt(0, 0, 0)
-        }
-      })
-    }
-    const rotationBtn = document.getElementById("toggle-rotation")
-    if (rotationBtn) {
-      rotationBtn.addEventListener("click", () => {
-        this.isRotating = !this.isRotating
-        rotationBtn.textContent = this.isRotating ? "Pause Rotation" : "Resume Rotation"
-      })
-    }
     this._startMarkerAnimation()
   }
 
