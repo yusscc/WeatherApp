@@ -9,11 +9,9 @@ A modern, interactive weather dashboard with real-time weather data and 3D globe
 - **Multi-page Navigation**: Dashboard, Locations, Forecast, Settings, and About pages
 - **City Search**: Search for any city worldwide with autocomplete suggestions
 - **Weather Forecasts**: 7-day weather forecasts with interactive charts
-- **Responsive Design**: Works on desktop and mobile devices
 - **Theme Support**: Dark and light theme options
 - **Temperature Units**: Celsius and Fahrenheit support
 
-## Pages
 
 ### Dashboard
 - Current weather conditions for selected city
@@ -25,6 +23,7 @@ A modern, interactive weather dashboard with real-time weather data and 3D globe
 - Search for cities and see them marked on the globe
 - Animated markers with pulsating effects
 - Orbit controls for 360° globe interaction
+- Attention globe isn't working as i planned but i tried atleast
 
 ### Forecast
 - 7-day weather forecast
